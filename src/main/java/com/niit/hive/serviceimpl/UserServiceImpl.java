@@ -1,29 +1,39 @@
 package com.niit.hive.serviceimpl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.niit.dao.UserDAO;
+import com.niit.hive.dao.UserDAO;
 import com.niit.hive.service.UserService;
-import com.niit.model.User;
+import com.niit.hive.model.User;
 
 public class UserServiceImpl implements UserService {
 
 	@Autowired
-	UserDAO userdao;
-	
+	UserDAO userDAO;
+
 	@Override
-	public void addUser(User user) {
-		userdao.addUser(user);
+	public boolean addUser(User user) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public void deleteUser(String username) {
-		userdao.deleteUser(username);
+	public boolean updateUser(String username) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public void updateUser(String username) {
-		userdao.updateUser(username);
+	public User getUser(String username) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
+	@Override
+	public List listUsers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
