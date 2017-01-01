@@ -7,13 +7,15 @@ import javax.persistence.Table;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name="Users")
 @Component
-@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
-public class User {
+//@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
+@JsonAutoDetect
+public class User extends BaseDomain{
 
 	@Id
 	private int username;

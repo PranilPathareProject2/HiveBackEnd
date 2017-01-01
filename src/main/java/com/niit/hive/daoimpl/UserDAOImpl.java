@@ -34,24 +34,18 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	@Transactional
-	public boolean updateUser(int username) {
+	public boolean updateUser(User user) {
 		try {
-			Session session = sessionFactory.getCurrentSession();
-			/*Transaction tran = session.beginTransaction();*/
-			User user = session.get(User.class, username);
-			user.setPassword("pranil*20");
-			session.update(user);
+			sessionFactory.getCurrentSession().update(user);
 		} catch (Exception e) {
 			return false;
 		}
-		/*tran.commit();
-		session.close();*/
 		return true;
 	}
 
 	@Override
 	@Transactional
-	public User getUser(String username) {
+	public User getUser(int username) {
 		User user = sessionFactory.getCurrentSession().get(User.class, username);
 		return user;
 	}
