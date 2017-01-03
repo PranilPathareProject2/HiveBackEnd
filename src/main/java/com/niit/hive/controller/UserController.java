@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.niit.hive.dao.UserCredentialDAO;
 import com.niit.hive.dao.UserDAO;
 import com.niit.hive.model.User;
+import com.niit.hive.model.UserCredential;
 
 @RestController
 public class UserController {
@@ -25,16 +27,30 @@ public class UserController {
 	@Autowired
 	User user;
 	
+	@Autowired
+	UserCredentialDAO userCredentialDAO;
+	
+	@Autowired
+	UserCredential userCredential;
+	
 	@RequestMapping(value="/adduser", method=RequestMethod.POST)
 	public ResponseEntity<User> register(@RequestBody User user)
 	{
-		
-		boolean status = userDAO.addUser(user);
-		if(status==false)
+		if(userDAO.getUser(user.getUsername())!=null)
 		{
-			//user = new User();
+			user = new User();
 			user.setErrorCode("404");
-			user.setErrorMessage("The registration is not success");
+			user.setErrorMessage("The registration is not success, username is already in use");
+		}
+		else
+		{
+			userDAO.addUser(user);
+			userCredential.setUsername(user.getUsername());
+			userCredential.setPassword(user.getPassword());
+			userCredential.setRole(user.getRole());
+			userCredentialDAO.addUserCredential(userCredential);
+			user.setErrorCode("200");
+			user.setErrorMessage("The registration is success");
 		}
 		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
@@ -42,14 +58,18 @@ public class UserController {
 	@RequestMapping(value="/updateuser", method=RequestMethod.PUT)
 	public ResponseEntity<User> updateUserInDB(@RequestBody User user)
 	{
-		boolean status = userDAO.updateUser(user);
-		if(status==false)
+		if(userDAO.getUser(user.getUsername())==null)
 		{
 			user = new User();
 			user.setErrorCode("404");
-			user.setErrorMessage("The registration is not success");
+			user.setErrorMessage("Update was not a success");
 		}
-		System.out.println("Status ==="+status);
+		else
+		{
+			userDAO.updateUser(user);
+			user.setErrorCode("200");
+			user.setErrorMessage("Update was successful");
+		}
 		
 		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
@@ -70,7 +90,7 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/getuser", method=RequestMethod.GET)
-	public ResponseEntity<User> getUserById(@RequestParam int id)
+	public ResponseEntity<User> getUserById(@RequestParam String id)
 	{
 		user = userDAO.getUser(id);
 		
@@ -78,7 +98,7 @@ public class UserController {
 		{
 			user = new User();
 			user.setErrorCode("404");
-			user.setErrorMessage("The registration is not success");
+			user.setErrorMessage("The requested user is not found");
 		}
 		
 		return new ResponseEntity<User>(user, HttpStatus.OK);

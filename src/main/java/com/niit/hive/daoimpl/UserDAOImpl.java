@@ -2,9 +2,11 @@ package com.niit.hive.daoimpl;
 
 import java.util.List;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +28,10 @@ public class UserDAOImpl implements UserDAO {
 	public boolean addUser(User user) {
 		try {
 			sessionFactory.getCurrentSession().save(user);
+			return true;
 		} catch (Exception e) {
 			return false;
 		}
-		return true;
 	}
 
 	@Override
@@ -45,7 +47,7 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	@Transactional
-	public User getUser(int username) {
+	public User getUser(String username) {
 		User user = sessionFactory.getCurrentSession().get(User.class, username);
 		return user;
 	}

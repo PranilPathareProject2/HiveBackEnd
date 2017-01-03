@@ -14,7 +14,9 @@ import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import com.niit.hive.model.Event;
 import com.niit.hive.model.User;
+import com.niit.hive.model.UserCredential;
 
 @Configuration
 @ComponentScan(basePackages="com.niit.*")
@@ -45,7 +47,9 @@ public class ApplicationContextConfig {
 	 
 	    LocalSessionFactoryBuilder sessionBuilder = new LocalSessionFactoryBuilder(dataSource);
 	    sessionBuilder.addProperties(getHibernateProperties());
-	    sessionBuilder.addAnnotatedClasses(User.class);
+	    sessionBuilder.scanPackages("com.niit.hive.model");
+	    //sessionBuilder.addAnnotatedClasses(UserCredential.class);
+	    //sessionBuilder.addAnnotatedClasses(Event.class);
 	    return sessionBuilder.buildSessionFactory();
 	}
 	
