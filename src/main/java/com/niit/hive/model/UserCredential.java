@@ -2,6 +2,7 @@ package com.niit.hive.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.springframework.stereotype.Component;
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Component;
 //@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 //@JsonAutoDetect
 public class UserCredential{
-
+	
+	@Id
 	private String username;
 	
 	private String password;

@@ -47,7 +47,10 @@ public class ApplicationContextConfig {
 	 
 	    LocalSessionFactoryBuilder sessionBuilder = new LocalSessionFactoryBuilder(dataSource);
 	    sessionBuilder.addProperties(getHibernateProperties());
-	    sessionBuilder.scanPackages("com.niit.hive.model");
+	    sessionBuilder.scanPackages(new String[] {"com.niit.hive.model"});
+	    // Two different ways to specify the previous step
+	    //sessionBuilder.addAnnotatedClasses(User.class, UserCredential.class, Event.class);
+	    //sessionBuilder.addAnnotatedClasses(User.class);
 	    //sessionBuilder.addAnnotatedClasses(UserCredential.class);
 	    //sessionBuilder.addAnnotatedClasses(Event.class);
 	    return sessionBuilder.buildSessionFactory();

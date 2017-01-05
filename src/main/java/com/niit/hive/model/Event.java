@@ -1,22 +1,26 @@
 package com.niit.hive.model;
 
+import java.sql.Date;
+
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.springframework.stereotype.Component;
 
 @Entity
-@Table(name="Event")
+@Table(name="HV_EVENT")
 @Component
 public class Event {
 
+	@Id
 	private String event_id;
 	
 	private String event_name;
 	
 	private String event_description;
 	
-	private String event_date;
+	private Date event_date;
 	
 	private String event_time;
 	
@@ -46,11 +50,11 @@ public class Event {
 		this.event_description = event_description;
 	}
 
-	public String getEvent_date() {
+	public Date getEvent_date() {
 		return event_date;
 	}
 
-	public void setEvent_date(String event_date) {
+	public void setEvent_date(Date event_date) {
 		this.event_date = event_date;
 	}
 
