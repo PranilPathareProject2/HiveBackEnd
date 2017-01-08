@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -102,5 +103,38 @@ public class UserController {
 		}
 		
 		return new ResponseEntity<User>(user, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/manageusers", method=RequestMethod.GET)
+	public ResponseEntity<List<UserCredential>> manageUsers()
+	{
+		List<UserCredential> users = userCredentialDAO.listUserCredentials();
+		
+		if(users.isEmpty())
+		{
+			userCredential.setErrorCode("404");
+			userCredential.setErrorMessage("No users are available");
+			users.add(userCredential);
+		}
+		
+		return new ResponseEntity<List<UserCredential>>(users, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/acceptuser/{username}", method=RequestMethod.PUT)
+	public ResponseEntity<UserCredential> acceptUsers(@PathVariable("username") String username)
+	{
+		if(!userCredentialDAO.acceptUser(username))
+		{
+			userCredential = new UserCredential();
+			userCredential.setErrorCode("404");
+			userCredential.setErrorMessage("Accepting was not a success");
+		}
+		else
+		{
+			userCredential.setErrorCode("200");
+			userCredential.setErrorMessage("Accepting was successful");
+		}
+		
+		return new ResponseEntity<UserCredential>(userCredential, HttpStatus.OK);
 	}
 }

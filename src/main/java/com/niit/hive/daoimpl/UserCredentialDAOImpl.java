@@ -26,10 +26,10 @@ public class UserCredentialDAOImpl implements UserCredentialDAO {
 	public boolean addUserCredential(UserCredential usercred) {
 		try {
 			sessionFactory.getCurrentSession().save(usercred);
-			return true;
 		} catch (Exception e) {
 			return false;
 		}
+		return true;
 	}
 
 	@Override
@@ -56,5 +56,18 @@ public class UserCredentialDAOImpl implements UserCredentialDAO {
 	public List listUserCredentials() {
 		List lius = sessionFactory.getCurrentSession().createQuery("from UserCredential").list();
 		return lius;
+	}
+
+	@Override
+	@Transactional
+	public boolean acceptUser(String username) {
+		try {
+			UserCredential usercred = this.getUserCredential(username);
+			usercred.setStatus("Accepted");
+			sessionFactory.getCurrentSession().update(usercred);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
 	}
 }

@@ -10,4 +10,5 @@ public interface UserCredentialDAO {
 	public boolean updateUserCredential(UserCredential usercredential);
 	public UserCredential getUserCredential(String username);
 	public List listUserCredentials();
+	public boolean acceptUser(String username);
 }

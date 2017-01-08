@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 //@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 //@JsonAutoDetect
-public class UserCredential{
+public class UserCredential extends BaseDomain{
 	
 	@Id
 	private String username;
