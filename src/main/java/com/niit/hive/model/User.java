@@ -32,7 +32,7 @@ public class User extends BaseDomain{
 	private String pincode;
 	private String experience;
 	private String qualification;
-	private String reason;
+	//private String reason;
 	
 	@Column(insertable=false)
 	private String status;
@@ -151,13 +151,13 @@ public class User extends BaseDomain{
 		this.qualification = qualification;
 	}
 
-	public String getReason() {
+	/*public String getReason() {
 		return reason;
 	}
 
 	public void setReason(String reason) {
 		this.reason = reason;
-	}
+	}*/
 
 	public String getStatus() {
 		return status;

@@ -64,6 +64,21 @@ public class UserCredentialDAOImpl implements UserCredentialDAO {
 		try {
 			UserCredential usercred = this.getUserCredential(username);
 			usercred.setStatus("Accepted");
+			usercred.setReason("");
+			sessionFactory.getCurrentSession().update(usercred);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	@Transactional
+	public boolean rejectUser(String username, String reason) {
+		try {
+			UserCredential usercred = this.getUserCredential(username);
+			usercred.setStatus("Rejected");
+			usercred.setReason(reason);
 			sessionFactory.getCurrentSession().update(usercred);
 		} catch (Exception e) {
 			return false;

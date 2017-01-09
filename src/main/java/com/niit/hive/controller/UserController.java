@@ -137,4 +137,22 @@ public class UserController {
 		
 		return new ResponseEntity<UserCredential>(userCredential, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value="/rejectuser/{username}/{reason}", method=RequestMethod.PUT)
+	public ResponseEntity<UserCredential> acceptUsers(@PathVariable("username") String username, @PathVariable("reason") String reason)
+	{
+		if(!userCredentialDAO.rejectUser(username, reason))
+		{
+			userCredential = new UserCredential();
+			userCredential.setErrorCode("404");
+			userCredential.setErrorMessage("Rejecting was not a success");
+		}
+		else
+		{
+			userCredential.setErrorCode("200");
+			userCredential.setErrorMessage("Rejecting was successful");
+		}
+		
+		return new ResponseEntity<UserCredential>(userCredential, HttpStatus.OK);
+	}
 }

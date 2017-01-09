@@ -11,4 +11,5 @@ public interface UserCredentialDAO {
 	public UserCredential getUserCredential(String username);
 	public List listUserCredentials();
 	public boolean acceptUser(String username);
+	public boolean rejectUser(String username, String reason);
 }

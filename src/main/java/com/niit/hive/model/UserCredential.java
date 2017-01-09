@@ -24,6 +24,8 @@ public class UserCredential extends BaseDomain{
 	@Column(insertable=false)
 	private String status;
 	
+	private String reason;
+	
 	public UserCredential() {
 		//super();
 	}
@@ -58,5 +60,13 @@ public class UserCredential extends BaseDomain{
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 }
