@@ -2,16 +2,16 @@ package com.niit.hive.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.niit.hive.dao.UserCredentialDAO;
@@ -139,7 +139,7 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/rejectuser/{username}/{reason}", method=RequestMethod.PUT)
-	public ResponseEntity<UserCredential> acceptUsers(@PathVariable("username") String username, @PathVariable("reason") String reason)
+	public ResponseEntity<UserCredential> rejectUsers(@PathVariable("username") String username, @PathVariable("reason") String reason)
 	{
 		if(!userCredentialDAO.rejectUser(username, reason))
 		{
@@ -153,6 +153,41 @@ public class UserController {
 			userCredential.setErrorMessage("Rejecting was successful");
 		}
 		
+		return new ResponseEntity<UserCredential>(userCredential, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/authenticateuser", method=RequestMethod.POST)
+	public ResponseEntity<UserCredential> authenticateUsers(@RequestBody UserCredential usercred, HttpSession httpSession)
+	{
+		UserCredential usercredobj = userCredentialDAO.authenticateUser(usercred.getUsername(), usercred.getPassword());
+		
+		if(usercredobj == null)
+		{
+			usercredobj = new UserCredential();
+			usercredobj.setErrorCode("404");
+			usercredobj.setErrorMessage("Invalid Credentials... Logging in was not a success");
+		}
+		else
+		{
+			usercredobj.setErrorCode("200");
+			usercredobj.setErrorMessage("Successfully logged in");
+			httpSession.setAttribute("loggedInUser", usercred.getUsername());
+			userDAO.setOnline(usercred.getUsername());
+		}
+		
+		return new ResponseEntity<UserCredential>(usercredobj, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/logout", method=RequestMethod.GET)
+	public ResponseEntity<UserCredential> logoutUser(HttpSession httpSession)
+	{
+		String username = (String) httpSession.getAttribute("loggedInUser");
+		userDAO.setOffline(username);
+		
+		httpSession.invalidate();
+		
+		userCredential.setErrorCode("200");
+		userCredential.setErrorMessage("Successfully logged out...");;
 		return new ResponseEntity<UserCredential>(userCredential, HttpStatus.OK);
 	}
 }

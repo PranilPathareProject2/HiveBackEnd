@@ -2,7 +2,9 @@ package com.niit.hive.daoimpl;
 
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,5 +86,18 @@ public class UserCredentialDAOImpl implements UserCredentialDAO {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	@Transactional
+	public UserCredential authenticateUser(String username, String password) {
+		@SuppressWarnings("deprecation")
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(UserCredential.class);
+		criteria.add(Restrictions.eq("username", username));
+		criteria.add(Restrictions.eq("password", password));
+		criteria.add(Restrictions.eq("status", "Accepted"));
+		
+		UserCredential usercred = (UserCredential) criteria.uniqueResult();
+		return usercred;
 	}
 }

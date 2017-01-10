@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.niit.hive.dao.UserDAO;
 import com.niit.hive.model.User;
+import com.niit.hive.model.UserCredential;
 
 @Repository("userDAO")
 public class UserDAOImpl implements UserDAO {
@@ -58,5 +59,31 @@ public class UserDAOImpl implements UserDAO {
 	public List listUsers() {
 		List lius = sessionFactory.getCurrentSession().createQuery("from User").list();
 		return lius;
+	}
+	
+	@Override
+	@Transactional
+	public boolean setOnline(String username) {
+		try {
+			User user = this.getUser(username);
+			user.setStatus("online");
+			sessionFactory.getCurrentSession().update(user);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	@Transactional
+	public boolean setOffline(String username) {
+		try {
+			User user = this.getUser(username);
+			user.setStatus("offline");
+			sessionFactory.getCurrentSession().update(user);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
 	}
 }

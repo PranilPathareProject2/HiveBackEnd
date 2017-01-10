@@ -9,4 +9,6 @@ public interface UserDAO {
 	public boolean updateUser(User user);
 	public User getUser(String username);
 	public List listUsers();
+	public boolean setOnline(String username);
+	public boolean setOffline(String username);
 }
