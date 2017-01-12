@@ -90,10 +90,10 @@ public class UserController {
 		return new ResponseEntity<List<User>>(users, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/getuser", method=RequestMethod.GET)
-	public ResponseEntity<User> getUserById(@RequestParam String id)
+	@RequestMapping(value="/getuser/{username}", method=RequestMethod.GET)
+	public ResponseEntity<User> getUserById(@PathVariable("username") String username)
 	{
-		user = userDAO.getUser(id);
+		user = userDAO.getUser(username);
 		
 		if(user == null)
 		{
@@ -151,6 +151,24 @@ public class UserController {
 		{
 			userCredential.setErrorCode("200");
 			userCredential.setErrorMessage("Rejecting was successful");
+		}
+		
+		return new ResponseEntity<UserCredential>(userCredential, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/makeadmin/{username}", method=RequestMethod.PUT)
+	public ResponseEntity<UserCredential> makeAdmin(@PathVariable("username") String username)
+	{
+		if(!userCredentialDAO.makeAdmin(username))
+		{
+			userCredential = new UserCredential();
+			userCredential.setErrorCode("404");
+			userCredential.setErrorMessage("Making admin was not a success");
+		}
+		else
+		{
+			userCredential.setErrorCode("200");
+			userCredential.setErrorMessage("Making admin was successful");
 		}
 		
 		return new ResponseEntity<UserCredential>(userCredential, HttpStatus.OK);

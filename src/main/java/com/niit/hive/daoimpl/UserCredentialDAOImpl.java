@@ -100,4 +100,17 @@ public class UserCredentialDAOImpl implements UserCredentialDAO {
 		UserCredential usercred = (UserCredential) criteria.uniqueResult();
 		return usercred;
 	}
+	
+	@Override
+	@Transactional
+	public boolean makeAdmin(String username) {
+		try {
+			UserCredential usercred = this.getUserCredential(username);
+			usercred.setRole("ROLE_ADMIN");
+			sessionFactory.getCurrentSession().update(usercred);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
 }
