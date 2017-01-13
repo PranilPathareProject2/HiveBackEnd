@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Entity
 @Table(name="HV_JOB")
 @Component
-public class Job {
+public class Job extends BaseDomain {
 
 	@Id
 	private String job_id;
@@ -21,19 +21,19 @@ public class Job {
 	
 	private String job_description;
 	
-	@Column(insertable=false)
+	@Column(insertable=false, updatable=false)
 	private Date posted_date;
 	
 	private String job_designation;
 	
-	@Column(insertable=false)
+	@Column(insertable=true, updatable=true)
 	private String job_salary;
 	
 	private String job_location;
 
-	private String experience_required;
+	private String experience;
 	
-	@Column(insertable=false)
+	@Column(insertable=false, updatable=false)
 	private String status;
 
 	public String getJob_id() {
@@ -92,12 +92,12 @@ public class Job {
 		this.job_location = job_location;
 	}
 
-	public String getExperience_required() {
-		return experience_required;
+	public String getExperience() {
+		return experience;
 	}
 
-	public void setExperience_required(String experience_required) {
-		this.experience_required = experience_required;
+	public void setExperience(String experience) {
+		this.experience = experience;
 	}
 
 	public String getStatus() {

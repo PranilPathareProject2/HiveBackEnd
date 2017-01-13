@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Entity
 @Table(name="HV_JOB_APPLIED")
 @Component
-public class JobApplied {
+public class JobApplied extends BaseDomain {
 
 	@Id
 	private String job_applied_id;
