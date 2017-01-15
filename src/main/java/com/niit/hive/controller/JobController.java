@@ -1,5 +1,7 @@
 package com.niit.hive.controller;
 
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.niit.hive.dao.JobDAO;
 import com.niit.hive.model.Job;
+import com.niit.hive.model.JobApplied;
 
 @RestController
 public class JobController {
@@ -24,6 +27,12 @@ public class JobController {
 	
 	@Autowired
 	Job job;
+	
+	@Autowired
+	JobApplied jobApplied;
+	
+	@Autowired
+	HttpSession session;
 	
 	@RequestMapping(value="/postjob", method=RequestMethod.POST)
 	public ResponseEntity<Job> register(@RequestBody Job job)
@@ -91,73 +100,95 @@ public class JobController {
 		return new ResponseEntity<Job>(job, HttpStatus.OK);
 	}
 	
-	/*@RequestMapping(value="/manageusers", method=RequestMethod.GET)
-	public ResponseEntity<List<UserCredential>> manageUsers()
+	@RequestMapping(value="/getmyappliedjobs", method=RequestMethod.GET)
+	public ResponseEntity<List<JobApplied>> getMyAppliedJobs()
 	{
-		List<UserCredential> users = userCredentialDAO.listUserCredentials();
+		String loggedInUser = (String) session.getAttribute("loggedInUser");
 		
-		if(users.isEmpty())
-		{
-			userCredential.setErrorCode("404");
-			userCredential.setErrorMessage("No users are available");
-			users.add(userCredential);
-		}
+		List<JobApplied> jobs = new ArrayList<JobApplied>();
 		
-		return new ResponseEntity<List<UserCredential>>(users, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/acceptuser/{username}", method=RequestMethod.PUT)
-	public ResponseEntity<UserCredential> acceptUsers(@PathVariable("username") String username)
-	{
-		if(!userCredentialDAO.acceptUser(username))
+		if(loggedInUser.isEmpty() || loggedInUser == null)
 		{
-			userCredential = new UserCredential();
-			userCredential.setErrorCode("404");
-			userCredential.setErrorMessage("Accepting was not a success");
+			jobApplied.setErrorCode("404");
+			jobApplied.setErrorMessage("You have to login to see your applied jobs");
+			jobs.add(jobApplied);
 		}
 		else
 		{
-			userCredential.setErrorCode("200");
-			userCredential.setErrorMessage("Accepting was successful");
+			jobs = jobDAO.getMyAppliedJobs(loggedInUser);
 		}
-		
-		return new ResponseEntity<UserCredential>(userCredential, HttpStatus.OK);
+		return new ResponseEntity<List<JobApplied>>(jobs, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/rejectuser/{username}/{reason}", method=RequestMethod.PUT)
-	public ResponseEntity<UserCredential> rejectUsers(@PathVariable("username") String username, @PathVariable("reason") String reason)
+	@RequestMapping(value="/applyjob/{job_id}", method=RequestMethod.PUT)
+	public ResponseEntity<JobApplied> acceptUsers(@PathVariable("job_id") String job_id)
 	{
-		if(!userCredentialDAO.rejectUser(username, reason))
+		String loggedInUser = (String) session.getAttribute("loggedInUser");
+		
+		if(loggedInUser.isEmpty() || loggedInUser == null)
 		{
-			userCredential = new UserCredential();
-			userCredential.setErrorCode("404");
-			userCredential.setErrorMessage("Rejecting was not a success");
+			jobApplied.setErrorCode("404");
+			jobApplied.setErrorMessage("You have to login to apply for jobs");
 		}
 		else
 		{
-			userCredential.setErrorCode("200");
-			userCredential.setErrorMessage("Rejecting was successful");
+			if(jobDAO.hasUserAppliedForTheJob(loggedInUser, job_id))
+			{
+				jobApplied.setJob_id(job_id);
+				jobApplied.setUsername(loggedInUser);
+				//jobApplied.setApplied_date(new Date(System.currentTimeMillis()));
+				
+				if(jobDAO.applyJob(jobApplied))
+				{
+					jobApplied.setErrorCode("200");
+					jobApplied.setErrorMessage("You have successfully applied for this job");
+				}
+			}
+			else
+			{
+				jobApplied.setErrorCode("404");
+				jobApplied.setErrorMessage("You have already applied for this job");
+			}
 		}
-		
-		return new ResponseEntity<UserCredential>(userCredential, HttpStatus.OK);
+		return new ResponseEntity<JobApplied>(jobApplied, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/makeadmin/{username}", method=RequestMethod.PUT)
-	public ResponseEntity<UserCredential> makeAdmin(@PathVariable("username") String username)
+	@RequestMapping(value="/selectuser/{job_id}/{username}/{reason}", method=RequestMethod.PUT)
+	public ResponseEntity<JobApplied> selectUser(@PathVariable("username") String username, @PathVariable("reason") String reason, @PathVariable("job_id") String job_id)
 	{
-		if(!userCredentialDAO.makeAdmin(username))
+		jobApplied = updateStatus(username, job_id, reason, "Selected");
+		return new ResponseEntity<JobApplied>(jobApplied, HttpStatus.OK);
+	}
+
+	@RequestMapping(value="/callforinterview/{job_id}/{username}/{reason}", method=RequestMethod.PUT)
+	public ResponseEntity<JobApplied> callForInterview(@PathVariable("username") String username, @PathVariable("reason") String reason, @PathVariable("job_id") String job_id)
+	{
+		jobApplied = updateStatus(username, job_id, reason, "Called For Interview");
+		return new ResponseEntity<JobApplied>(jobApplied, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/rejectjobapplication/{job_id}/{username}/{reason}", method=RequestMethod.PUT)
+	public ResponseEntity<JobApplied> rejectJobApplication(@PathVariable("username") String username, @PathVariable("reason") String reason, @PathVariable("job_id") String job_id)
+	{
+		jobApplied = updateStatus(username, job_id, reason, "Rejected");
+		return new ResponseEntity<JobApplied>(jobApplied, HttpStatus.OK);
+	}
+	
+	private JobApplied updateStatus(String username, String job_id, String reason, String status)
+	{
+		String loggedInUser = (String) session.getAttribute("loggedInUser");
+		//String loggedInUserRole = (String) session.getAttribute("loggedInUserRole"); check this
+		
+		if(loggedInUser.isEmpty() || loggedInUser == null)
 		{
-			userCredential = new UserCredential();
-			userCredential.setErrorCode("404");
-			userCredential.setErrorMessage("Making admin was not a success");
+			jobApplied.setErrorCode("404");
+			jobApplied.setErrorMessage("You have to login to do this operation");
+			return jobApplied;
 		}
 		else
 		{
-			userCredential.setErrorCode("200");
-			userCredential.setErrorMessage("Making admin was successful");
+			
 		}
-		
-		return new ResponseEntity<UserCredential>(userCredential, HttpStatus.OK);
-	}*/
-	
+		return jobApplied;
+	}
 }

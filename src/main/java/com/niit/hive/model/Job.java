@@ -26,14 +26,13 @@ public class Job extends BaseDomain {
 	
 	private String job_designation;
 	
-	@Column(insertable=true, updatable=true)
 	private String job_salary;
 	
 	private String job_location;
 
 	private String experience;
 	
-	@Column(insertable=false, updatable=false)
+	@Column(insertable=false)
 	private String status;
 
 	public String getJob_id() {

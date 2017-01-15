@@ -24,7 +24,7 @@ public class JobApplied extends BaseDomain {
 	@Column(insertable=false)
 	private Date applied_date;
 	
-	private String rejection_reason;
+	private String reason;
 	
 	@Column(insertable=false)
 	private String status;
@@ -61,12 +61,12 @@ public class JobApplied extends BaseDomain {
 		this.applied_date = applied_date;
 	}
 
-	public String getRejection_reason() {
-		return rejection_reason;
+	public String getReason() {
+		return reason;
 	}
 
-	public void setRejection_reason(String rejection_reason) {
-		this.rejection_reason = rejection_reason;
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 
 	public String getStatus() {
