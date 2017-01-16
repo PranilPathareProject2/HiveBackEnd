@@ -189,8 +189,9 @@ public class UserController {
 		{
 			usercredobj.setErrorCode("200");
 			usercredobj.setErrorMessage("Successfully logged in");
-			httpSession.setAttribute("loggedInUser", usercred.getUsername());
-			userDAO.setOnline(usercred.getUsername());
+			httpSession.setAttribute("loggedInUser", usercredobj.getUsername());
+			httpSession.setAttribute("loggedInUserRole", usercredobj.getRole());
+			userDAO.setOnline(usercredobj.getUsername());
 		}
 		
 		return new ResponseEntity<UserCredential>(usercredobj, HttpStatus.OK);

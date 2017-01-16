@@ -32,7 +32,7 @@ public class JobController {
 	JobApplied jobApplied;
 	
 	@Autowired
-	HttpSession session;
+	HttpSession httpSession;
 	
 	@RequestMapping(value="/postjob", method=RequestMethod.POST)
 	public ResponseEntity<Job> register(@RequestBody Job job)
@@ -85,6 +85,21 @@ public class JobController {
 		return new ResponseEntity<List<Job>>(jobs, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value="/getalljobapplications", method=RequestMethod.GET)
+	public ResponseEntity<List<JobApplied>> listjobapplications()
+	{
+		List<JobApplied> jobapplications = jobDAO.allJobApplications();
+		
+		if(jobapplications.isEmpty())
+		{
+			jobApplied.setErrorCode("404");
+			jobApplied.setErrorMessage("No jobs are available");
+			jobapplications.add(jobApplied);
+		}
+		
+		return new ResponseEntity<List<JobApplied>>(jobapplications, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value="/getjobdetails/{job_id}", method=RequestMethod.GET)
 	public ResponseEntity<Job> getJobById(@PathVariable("job_id") String job_id)
 	{
@@ -103,12 +118,13 @@ public class JobController {
 	@RequestMapping(value="/getmyappliedjobs", method=RequestMethod.GET)
 	public ResponseEntity<List<JobApplied>> getMyAppliedJobs()
 	{
-		String loggedInUser = (String) session.getAttribute("loggedInUser");
+		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
 		
 		List<JobApplied> jobs = new ArrayList<JobApplied>();
 		
-		if(loggedInUser.isEmpty() || loggedInUser == null)
+		if(loggedInUser == null)
 		{
+			//jobApplied = new JobApplied();
 			jobApplied.setErrorCode("404");
 			jobApplied.setErrorMessage("You have to login to see your applied jobs");
 			jobs.add(jobApplied);
@@ -116,23 +132,29 @@ public class JobController {
 		else
 		{
 			jobs = jobDAO.getMyAppliedJobs(loggedInUser);
+			if(jobs.isEmpty())
+			{
+				jobApplied.setErrorCode("404");
+				jobApplied.setErrorMessage("No applied jobs for this user");
+				jobs.add(jobApplied);
+			}	
 		}
 		return new ResponseEntity<List<JobApplied>>(jobs, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/applyjob/{job_id}", method=RequestMethod.PUT)
-	public ResponseEntity<JobApplied> acceptUsers(@PathVariable("job_id") String job_id)
+	@RequestMapping(value="/applyjob/{job_id}", method=RequestMethod.POST)
+	public ResponseEntity<JobApplied> applyJob(@PathVariable("job_id") String job_id)
 	{
-		String loggedInUser = (String) session.getAttribute("loggedInUser");
-		
-		if(loggedInUser.isEmpty() || loggedInUser == null)
+		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
+		//System.out.println("job id ="+job_id);
+		if(loggedInUser == null)
 		{
 			jobApplied.setErrorCode("404");
 			jobApplied.setErrorMessage("You have to login to apply for jobs");
 		}
 		else
 		{
-			if(jobDAO.hasUserAppliedForTheJob(loggedInUser, job_id))
+			if(jobDAO.getJobApplication(loggedInUser, job_id)==null)
 			{
 				jobApplied.setJob_id(job_id);
 				jobApplied.setUsername(loggedInUser);
@@ -176,19 +198,45 @@ public class JobController {
 	
 	private JobApplied updateStatus(String username, String job_id, String reason, String status)
 	{
-		String loggedInUser = (String) session.getAttribute("loggedInUser");
-		//String loggedInUserRole = (String) session.getAttribute("loggedInUserRole"); check this
+		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
+		String loggedInUserRole = (String) httpSession.getAttribute("loggedInUserRole");
 		
-		if(loggedInUser.isEmpty() || loggedInUser == null)
+		if(loggedInUserRole == null)
 		{
+			//jobApplied = new JobApplied();
 			jobApplied.setErrorCode("404");
 			jobApplied.setErrorMessage("You have to login to do this operation");
 			return jobApplied;
 		}
+		
+		String checkrole = "ROLE_ADMIN";
+		boolean check = loggedInUserRole.equalsIgnoreCase(checkrole);
+		
+		if(!check)
+		{
+			//jobApplied = new JobApplied();
+			jobApplied.setErrorCode("404");
+			jobApplied.setErrorMessage("You are not authorized to do this operation");
+			return jobApplied;
+		}
 		else
 		{
-			
+			jobApplied = jobDAO.getJobApplication(username, job_id);
+		
+			jobApplied.setStatus(status);
+			jobApplied.setReason(reason);
+		
+			if(jobDAO.updateJobApplication(jobApplied))
+			{
+				jobApplied.setErrorCode("200");
+				jobApplied.setErrorMessage("Successfully updated the status");
+			}
+			else
+			{
+				jobApplied.setErrorCode("404");
+				jobApplied.setErrorMessage("Updating the status was not successful");
+			}
+			return jobApplied;
 		}
-		return jobApplied;
 	}
 }

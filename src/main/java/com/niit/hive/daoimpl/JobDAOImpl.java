@@ -140,20 +140,32 @@ public class JobDAOImpl implements JobDAO {
 	}
 
 	@Override
-	public boolean hasUserAppliedForTheJob(String username, String job_id) {
+	@Transactional
+	public JobApplied getJobApplication(String username, String job_id) {
 		
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(JobApplied.class);
 		criteria.add(Restrictions.eq("job_id", job_id));
 		criteria.add(Restrictions.eq("username", username));
 		
-		List<JobApplied> liaj = criteria.list();
-		if(liaj.isEmpty())
-		{
-			return true;
-		}	
-		else
-		{
+		JobApplied jobapp = (JobApplied) criteria.uniqueResult();
+		return jobapp;
+	}
+	
+	@Override
+	@Transactional
+	public boolean updateJobApplication(JobApplied jobapp) {
+		try {
+			sessionFactory.getCurrentSession().update(jobapp);
+		} catch (Exception e) {
 			return false;
 		}
+		return true;
+	}
+
+	@Override
+	@Transactional
+	public List<JobApplied> allJobApplications() {
+		List liajas = sessionFactory.getCurrentSession().createQuery("from JobApplied").list();
+		return liajas;
 	}
 }

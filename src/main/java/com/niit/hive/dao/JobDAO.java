@@ -15,5 +15,7 @@ public interface JobDAO {
 		public List getMyAppliedJobs(String username);
 		public boolean applyJob(JobApplied job);
 		public String nextJobAppliedID();
-		public boolean hasUserAppliedForTheJob(String username, String job_id);
+		public JobApplied getJobApplication(String username, String job_id);
+		public boolean updateJobApplication(JobApplied jobapp);
+		public List allJobApplications();
 }
