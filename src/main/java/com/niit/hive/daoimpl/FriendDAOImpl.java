@@ -100,14 +100,42 @@ public class FriendDAOImpl implements FriendDAO {
 	}
 
 	@Override
+	@Transactional
 	public void setOnline(String user_username) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
+	@Transactional
 	public void setOffline(String user_username) {
-		// TODO Auto-generated method stub
 		
+		
+	}
+
+	@Override
+	@Transactional
+	public List getNewFriendRequests(String user_username) {
+		
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Friend.class);
+		criteria.add(Restrictions.eq("friend_username", user_username));
+		criteria.add(Restrictions.eq("status", "Pending"));
+		
+		List linfr = criteria.list();
+		
+		return linfr;
+	}
+	
+	@Override
+	@Transactional
+	public List getSentFriendRequests(String user_username) {
+		
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Friend.class);
+		criteria.add(Restrictions.eq("user_username", user_username));
+		criteria.add(Restrictions.eq("status", "Pending"));
+		
+		List lisfr = criteria.list();
+		
+		return lisfr;
 	}
 }

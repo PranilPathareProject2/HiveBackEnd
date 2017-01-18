@@ -2,6 +2,7 @@ package com.niit.hive.model;
 
 import java.sql.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -20,8 +21,10 @@ public class Friend extends BaseDomain{
 	
 	private String user_username;
 	
+	@Column(insertable=false)
 	private String status;
 	
+	@Column(insertable=false)
 	private String is_online;
 
 	public String getFriend_id() {

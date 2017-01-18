@@ -62,26 +62,33 @@ public class FriendController {
 	}
 	
 	@RequestMapping(value="/addfriendrequest/{friend_username}", method=RequestMethod.POST)
-	public ResponseEntity<Friend> register(@PathVariable("friend_username") String friend_username)
+	public ResponseEntity<Friend> addFriendRequest(@PathVariable("friend_username") String friend_username)
 	{
 		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
 
+		System.out.println("loggedInUser = "+loggedInUser);
 		if(loggedInUser == null)
 		{
 			friend.setErrorCode("404");
 			friend.setErrorMessage("You have to login to send friend request");
+			//return new ResponseEntity<Friend>(friend, HttpStatus.OK);
 		}
-		
-		if(isUserExists(friend_username))
+		else if(isUserExists(friend_username))
 		{
+			System.out.println("isUserExists(friend_username) = "+isUserExists(friend_username));
 			friend.setErrorCode("404");
 			friend.setErrorMessage("Friend with username: "+friend_username+" does not exists");
 		}
-		
-		if(friendDAO.getFriendship(loggedInUser, friend_username)!=null)
+		else if(friendDAO.getFriendship(loggedInUser, friend_username)!=null || friendDAO.getFriendship(friend_username, loggedInUser)!=null)
 		{
+			System.out.println("friendDAO.getFriendship(loggedInUser, friend_username) ="+friendDAO.getFriendship(loggedInUser, friend_username));
 			friend.setErrorCode("404");
 			friend.setErrorMessage("You have already send this friend request");
+		}
+		else if(loggedInUser.equals(friend_username))
+		{
+			friend.setErrorCode("404");
+			friend.setErrorMessage("You cannot send friend request to yourself");
 		}
 		else
 		{
@@ -112,7 +119,7 @@ public class FriendController {
 	@RequestMapping(value="/unfriend/{friend_username}", method=RequestMethod.PUT)
 	public ResponseEntity<Friend> unfriend(@PathVariable("friend_username") String friend_username)
 	{
-		friend = updateStatus(friend_username, "Unfriend");
+		friend = updateStatus(friend_username, "Unfriended");
 		return new ResponseEntity<Friend>(friend, HttpStatus.OK);
 	}
 	
@@ -128,221 +135,109 @@ public class FriendController {
 		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
 		//String loggedInUserRole = (String) httpSession.getAttribute("loggedInUserRole");
 		
-		if(isFriendRequestExists(loggedInUser, friend_username))
+		System.out.println("loggedInUser = "+loggedInUser);
+		if(loggedInUser == null)
 		{
-			
+			friend.setErrorCode("404");
+			friend.setErrorMessage("You have to login to update friend request");
+			//return new ResponseEntity<Friend>(friend, HttpStatus.OK);
 		}
-		
-		if(status.equals("Accepted") || status.equals("Rejected"))
+		else if(status.equals("Accepted") || status.equals("Rejected"))
 		{
+			if(isFriendRequestExists(friend_username, loggedInUser))
+			{
+				friend.setErrorCode("404");
+				friend.setErrorMessage("The Friend request does not exists");
+				//return friend;
+			}
+			else
+			{	
 			friend = friendDAO.getFriendship(friend_username, loggedInUser);
+			friend.setStatus(status);
+			friendDAO.updateFriendship(friend);
+			
+			friend.setErrorCode("200");
+			friend.setErrorMessage("Friend request updated successfully");
+			}
 		}
 		else
 		{
+			if(isFriendRequestExists(loggedInUser, friend_username))
+			{
+				friend.setErrorCode("404");
+				friend.setErrorMessage("The Friend request does not exists");
+				//return friend;
+			}
+			else
+			{
 			friend = friendDAO.getFriendship(loggedInUser, friend_username);
+			friend.setStatus(status);
+			friendDAO.updateFriendship(friend);
+			
+			friend.setErrorCode("200");
+			friend.setErrorMessage("Friend request updated successfully");
+			}
 		}
-		
-		friend.setStatus(status);
-		friendDAO.updateFriendship(friend);
-		
-		friend.setErrorCode("200");
-		friend.setErrorMessage("Friend request updated successfully");
+	
 		return friend;
 	}
 	
-	private boolean isFriendRequestExists(String loggedInUser, String friend_username) {
-		if(friendDAO.getFriendship(loggedInUser, friend_username)!=null)
+	private boolean isFriendRequestExists(String friend_username, String loggedInUser) {
+		if(friendDAO.getFriendship(friend_username, loggedInUser)!=null)
 			return false;
 		else	
 			return true;
 	}
 
-	/*@RequestMapping(value="/updatejob", method=RequestMethod.PUT)
-	public ResponseEntity<Job> updateUserInDB(@RequestBody Job job)
-	{
-		if(jobDAO.getJob(job.getJob_id())==null)
-		{
-			job = new Job();
-			job.setErrorCode("404");
-			job.setErrorMessage("Updating Job was not a success");
-		}
-		else
-		{
-			jobDAO.updateJob(job);
-			job.setErrorCode("200");
-			job.setErrorMessage("Updating Job was successful");
-		}
-		
-		return new ResponseEntity<Job>(job, HttpStatus.OK);
-	}*/
-	
-	/*@RequestMapping(value="/alljobs", method=RequestMethod.GET)
-	public ResponseEntity<List<Job>> listUsers()
-	{
-		List<Job> jobs = jobDAO.allJobs();
-		
-		if(jobs.isEmpty())
-		{
-			job.setErrorCode("404");
-			job.setErrorMessage("No jobs are available");
-			jobs.add(job);
-		}
-		
-		return new ResponseEntity<List<Job>>(jobs, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/getalljobapplications", method=RequestMethod.GET)
-	public ResponseEntity<List<JobApplied>> listjobapplications()
-	{
-		List<JobApplied> jobapplications = jobDAO.allJobApplications();
-		
-		if(jobapplications.isEmpty())
-		{
-			jobApplied.setErrorCode("404");
-			jobApplied.setErrorMessage("No jobs are available");
-			jobapplications.add(jobApplied);
-		}
-		
-		return new ResponseEntity<List<JobApplied>>(jobapplications, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/getjobdetails/{job_id}", method=RequestMethod.GET)
-	public ResponseEntity<Job> getJobById(@PathVariable("job_id") String job_id)
-	{
-		job = jobDAO.getJob(job_id);
-		
-		if(job == null)
-		{
-			job = new Job();
-			job.setErrorCode("404");
-			job.setErrorMessage("The requested job is not found");
-		}
-		
-		return new ResponseEntity<Job>(job, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/getmyappliedjobs", method=RequestMethod.GET)
-	public ResponseEntity<List<JobApplied>> getMyAppliedJobs()
-	{
-		String username = (String) httpSession.getAttribute("loggedInUser");
-		System.out.println("********username**********="+username);
-		List<JobApplied> jobs = new ArrayList<JobApplied>();
-		
-		if(username == null)
-		{
-			//jobApplied = new JobApplied();
-			jobApplied.setErrorCode("404");
-			jobApplied.setErrorMessage("You have to login to see your applied jobs");
-			jobs.add(jobApplied);
-		}
-		else
-		{
-			jobs = jobDAO.getMyAppliedJobs(username);
-			if(jobs.isEmpty())
-			{
-				jobApplied.setErrorCode("404");
-				jobApplied.setErrorMessage("No applied jobs for this user");
-				jobs.add(jobApplied);
-			}	
-		}
-		return new ResponseEntity<List<JobApplied>>(jobs, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/applyjob/{job_id}", method=RequestMethod.POST)
-	public ResponseEntity<JobApplied> applyJob(@PathVariable("job_id") String job_id)
+	@RequestMapping(value="/getnewfriendrequests", method=RequestMethod.GET)
+	public ResponseEntity<List<Friend>> listFriendRequests()
 	{
 		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
-		//System.out.println("job id ="+job_id);
+
+		List<Friend> friendrequests = new ArrayList<Friend>();
 		if(loggedInUser == null)
 		{
-			jobApplied.setErrorCode("404");
-			jobApplied.setErrorMessage("You have to login to apply for jobs");
+			friend.setErrorCode("404");
+			friend.setErrorMessage("You have to login to see your new friend requests");
+			friendrequests.add(friend);
+			return new ResponseEntity<List<Friend>>(friendrequests, HttpStatus.OK);
 		}
-		else
+		
+		friendrequests = friendDAO.getNewFriendRequests(loggedInUser);
+		
+		if(friendrequests.isEmpty())
 		{
-			if(jobDAO.getJobApplication(loggedInUser, job_id)==null)
-			{
-				jobApplied.setJob_id(job_id);
-				jobApplied.setUsername(loggedInUser);
-				//jobApplied.setApplied_date(new Date(System.currentTimeMillis()));
-				
-				if(jobDAO.applyJob(jobApplied))
-				{
-					jobApplied.setErrorCode("200");
-					jobApplied.setErrorMessage("You have successfully applied for this job");
-				}
-			}
-			else
-			{
-				jobApplied.setErrorCode("404");
-				jobApplied.setErrorMessage("You have already applied for this job");
-			}
+			friend.setErrorCode("404");
+			friend.setErrorMessage("You have no new friend requests");
+			friendrequests.add(friend);
 		}
-		return new ResponseEntity<JobApplied>(jobApplied, HttpStatus.OK);
+		
+		return new ResponseEntity<List<Friend>>(friendrequests, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/selectuser/{job_id}/{username}/{reason}", method=RequestMethod.PUT)
-	public ResponseEntity<JobApplied> selectUser(@PathVariable("username") String username, @PathVariable("reason") String reason, @PathVariable("job_id") String job_id)
-	{
-		jobApplied = updateStatus(username, job_id, reason, "Selected");
-		return new ResponseEntity<JobApplied>(jobApplied, HttpStatus.OK);
-	}
-
-	@RequestMapping(value="/callforinterview/{job_id}/{username}/{reason}", method=RequestMethod.PUT)
-	public ResponseEntity<JobApplied> callForInterview(@PathVariable("username") String username, @PathVariable("reason") String reason, @PathVariable("job_id") String job_id)
-	{
-		jobApplied = updateStatus(username, job_id, reason, "Called For Interview");
-		return new ResponseEntity<JobApplied>(jobApplied, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/rejectjobapplication/{job_id}/{username}/{reason}", method=RequestMethod.PUT)
-	public ResponseEntity<JobApplied> rejectJobApplication(@PathVariable("username") String username, @PathVariable("reason") String reason, @PathVariable("job_id") String job_id)
-	{
-		jobApplied = updateStatus(username, job_id, reason, "Rejected");
-		return new ResponseEntity<JobApplied>(jobApplied, HttpStatus.OK);
-	}
-	
-	private JobApplied updateStatus(String username, String job_id, String reason, String status)
+	@RequestMapping(value="/getsentfriendrequests", method=RequestMethod.GET)
+	public ResponseEntity<List<Friend>> listSentFriendRequests()
 	{
 		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
-		String loggedInUserRole = (String) httpSession.getAttribute("loggedInUserRole");
-		
-		if(loggedInUserRole == null)
+
+		List<Friend> sentfriendrequests = new ArrayList<Friend>();
+		if(loggedInUser == null)
 		{
-			//jobApplied = new JobApplied();
-			jobApplied.setErrorCode("404");
-			jobApplied.setErrorMessage("You have to login to do this operation");
-			return jobApplied;
+			friend.setErrorCode("404");
+			friend.setErrorMessage("You have to login to see your sent friend requests");
+			sentfriendrequests.add(friend);
+			return new ResponseEntity<List<Friend>>(sentfriendrequests, HttpStatus.OK);
 		}
 		
-		String checkrole = "ROLE_ADMIN";
-		boolean check = loggedInUserRole.equalsIgnoreCase(checkrole);
+		sentfriendrequests = friendDAO.getSentFriendRequests(loggedInUser);
 		
-		if(!check)
+		if(sentfriendrequests.isEmpty())
 		{
-			//jobApplied = new JobApplied();
-			jobApplied.setErrorCode("404");
-			jobApplied.setErrorMessage("You are not authorized to do this operation");
-			return jobApplied;
+			friend.setErrorCode("404");
+			friend.setErrorMessage("You have not sent any friend requests");
+			sentfriendrequests.add(friend);
 		}
-		else
-		{
-			jobApplied = jobDAO.getJobApplication(username, job_id);
 		
-			jobApplied.setStatus(status);
-			jobApplied.setReason(reason);
-		
-			if(jobDAO.updateJobApplication(jobApplied))
-			{
-				jobApplied.setErrorCode("200");
-				jobApplied.setErrorMessage("Successfully updated the status");
-			}
-			else
-			{
-				jobApplied.setErrorCode("404");
-				jobApplied.setErrorMessage("Updating the status was not successful");
-			}
-			return jobApplied;
-		}
-	}*/
+		return new ResponseEntity<List<Friend>>(sentfriendrequests, HttpStatus.OK);
+	}
 }
