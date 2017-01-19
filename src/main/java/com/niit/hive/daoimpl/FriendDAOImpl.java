@@ -99,24 +99,41 @@ public class FriendDAOImpl implements FriendDAO {
 		return newID;
 	}
 
+	@SuppressWarnings({ "rawtypes", "deprecation" })
 	@Override
 	@Transactional
 	public void setOnline(String user_username) {
 		
+		String hql1 = "update Friend set is_online='Yes' where user_username='"+user_username+"'";
+		String hql2 = "update Friend set is_online='Yes' where friend_username='"+user_username+"'";
 		
+		Query q1 = sessionFactory.getCurrentSession().createQuery(hql1);
+		Query q2 = sessionFactory.getCurrentSession().createQuery(hql2);
+		
+		q1.executeUpdate();
+		q2.executeUpdate();
 	}
 
+	@SuppressWarnings({ "rawtypes", "deprecation" })
 	@Override
 	@Transactional
 	public void setOffline(String user_username) {
 		
+		String hql1 = "update Friend set is_online='No' where user_username='"+user_username+"'";
+		String hql2 = "update Friend set is_online='No' where friend_username='"+user_username+"'";
 		
+		Query q1 = sessionFactory.getCurrentSession().createQuery(hql1);
+		Query q2 = sessionFactory.getCurrentSession().createQuery(hql2);
+		
+		q1.executeUpdate();
+		q2.executeUpdate();
 	}
 
 	@Override
 	@Transactional
 	public List getNewFriendRequests(String user_username) {
 		
+		@SuppressWarnings("deprecation")
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Friend.class);
 		criteria.add(Restrictions.eq("friend_username", user_username));
 		criteria.add(Restrictions.eq("status", "Pending"));
@@ -130,6 +147,7 @@ public class FriendDAOImpl implements FriendDAO {
 	@Transactional
 	public List getSentFriendRequests(String user_username) {
 		
+		@SuppressWarnings("deprecation")
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Friend.class);
 		criteria.add(Restrictions.eq("user_username", user_username));
 		criteria.add(Restrictions.eq("status", "Pending"));
@@ -137,5 +155,23 @@ public class FriendDAOImpl implements FriendDAO {
 		List lisfr = criteria.list();
 		
 		return lisfr;
+	}
+	
+	@Override
+	@Transactional
+	public List getOnlineFriends(String user_username) {
+		
+		String hql1 = "select friend_username from Friend where user_username='"+user_username+"' and status='Accepted' and is_online='Yes'";
+		String hql2 = "select user_username from Friend where friend_username='"+user_username+"' and status='Accepted' and is_online='Yes'";
+		
+		Query q1 = sessionFactory.getCurrentSession().createQuery(hql1);
+		Query q2 = sessionFactory.getCurrentSession().createQuery(hql2);
+		
+		List lifo1 = q1.list();
+		List lifo2 = q2.list();
+		
+		lifo1.addAll(lifo2);
+		
+		return lifo1;
 	}
 }

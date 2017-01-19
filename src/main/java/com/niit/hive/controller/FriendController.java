@@ -240,4 +240,30 @@ public class FriendController {
 		
 		return new ResponseEntity<List<Friend>>(sentfriendrequests, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value="/getonlinefriends", method=RequestMethod.GET)
+	public ResponseEntity<List<Friend>> listOnlineFriends()
+	{
+		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
+
+		List<Friend> onlinefriends = new ArrayList<Friend>();
+		if(loggedInUser == null)
+		{
+			friend.setErrorCode("404");
+			friend.setErrorMessage("You have to login to see your online friends");
+			onlinefriends.add(friend);
+			return new ResponseEntity<List<Friend>>(onlinefriends, HttpStatus.OK);
+		}
+		
+		onlinefriends = friendDAO.getOnlineFriends(loggedInUser);
+		
+		if(onlinefriends.isEmpty())
+		{
+			friend.setErrorCode("404");
+			friend.setErrorMessage("You have no new friend requests");
+			onlinefriends.add(friend);
+		}
+		
+		return new ResponseEntity<List<Friend>>(onlinefriends, HttpStatus.OK);
+	}
 }

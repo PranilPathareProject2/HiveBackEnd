@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.niit.hive.dao.FriendDAO;
 import com.niit.hive.dao.UserCredentialDAO;
 import com.niit.hive.dao.UserDAO;
 import com.niit.hive.model.User;
@@ -24,6 +25,9 @@ public class UserController {
 
 	@Autowired
 	UserDAO userDAO;
+	
+	@Autowired
+	FriendDAO friendDAO;
 	
 	@Autowired
 	User user;
@@ -192,6 +196,7 @@ public class UserController {
 			httpSession.setAttribute("loggedInUser", usercredobj.getUsername());
 			httpSession.setAttribute("loggedInUserRole", usercredobj.getRole());
 			userDAO.setOnline(usercredobj.getUsername());
+			friendDAO.setOnline(usercredobj.getUsername());
 		}
 		
 		return new ResponseEntity<UserCredential>(usercredobj, HttpStatus.OK);
@@ -202,6 +207,7 @@ public class UserController {
 	{
 		String username = (String) httpSession.getAttribute("loggedInUser");
 		userDAO.setOffline(username);
+		friendDAO.setOffline(username);
 		
 		httpSession.invalidate();
 		
