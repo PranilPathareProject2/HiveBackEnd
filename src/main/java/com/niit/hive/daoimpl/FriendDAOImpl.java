@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.niit.hive.dao.FriendDAO;
+import com.niit.hive.dao.UserDAO;
 import com.niit.hive.model.Friend;
 import com.niit.hive.model.Job;
 
@@ -19,6 +20,9 @@ public class FriendDAOImpl implements FriendDAO {
 
 	@Autowired
 	public SessionFactory sessionFactory;
+	
+	@Autowired
+	UserDAO userDAO;
 	
 	public FriendDAOImpl(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
@@ -161,8 +165,8 @@ public class FriendDAOImpl implements FriendDAO {
 	@Transactional
 	public List getOnlineFriends(String user_username) {
 		
-		String hql1 = "select friend_username from Friend where user_username='"+user_username+"' and status='Accepted' and is_online='Yes'";
-		String hql2 = "select user_username from Friend where friend_username='"+user_username+"' and status='Accepted' and is_online='Yes'";
+		String hql1 = "select friend_username from Friend where user_username='"+user_username+"' and status='Accepted'";
+		String hql2 = "select user_username from Friend where friend_username='"+user_username+"' and status='Accepted'";
 		
 		Query q1 = sessionFactory.getCurrentSession().createQuery(hql1);
 		Query q2 = sessionFactory.getCurrentSession().createQuery(hql2);

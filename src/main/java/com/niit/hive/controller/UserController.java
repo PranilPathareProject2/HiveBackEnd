@@ -82,7 +82,7 @@ public class UserController {
 	@RequestMapping(value="/listusers", method=RequestMethod.GET)
 	public ResponseEntity<List<User>> listUsers()
 	{
-		List<User> users = userDAO.listUsers();
+		List<User> users = userCredentialDAO.listApprovedUsers();
 		
 		if(users.isEmpty())
 		{

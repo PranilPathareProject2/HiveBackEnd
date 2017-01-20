@@ -55,6 +55,20 @@ public class UserCredentialDAOImpl implements UserCredentialDAO {
 	@SuppressWarnings("deprecation")
 	@Override
 	@Transactional
+	public List listApprovedUsers() {
+		
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(UserCredential.class);
+		criteria.add(Restrictions.eq("status", "Accepted"));
+		criteria.add(Restrictions.ne("role", "ROLE_ADMIN"));
+		
+		List lius = criteria.list();
+		return lius;
+	}
+	
+	
+	@SuppressWarnings("deprecation")
+	@Override
+	@Transactional
 	public List listUserCredentials() {
 		List lius = sessionFactory.getCurrentSession().createQuery("from UserCredential").list();
 		return lius;

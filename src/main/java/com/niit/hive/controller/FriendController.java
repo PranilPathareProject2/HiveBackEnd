@@ -162,7 +162,7 @@ public class FriendController {
 		}
 		else
 		{
-			if(isFriendRequestExists(loggedInUser, friend_username))
+			if(isFriendRequestExists(loggedInUser, friend_username) && isFriendRequestExists(friend_username, loggedInUser))
 			{
 				friend.setErrorCode("404");
 				friend.setErrorMessage("The Friend request does not exists");
@@ -170,12 +170,19 @@ public class FriendController {
 			}
 			else
 			{
-			friend = friendDAO.getFriendship(loggedInUser, friend_username);
-			friend.setStatus(status);
-			friendDAO.updateFriendship(friend);
-			
-			friend.setErrorCode("200");
-			friend.setErrorMessage("Friend request updated successfully");
+				if(!isFriendRequestExists(loggedInUser, friend_username))
+				{	
+					friend = friendDAO.getFriendship(loggedInUser, friend_username);
+				}
+				else
+				{
+					friend = friendDAO.getFriendship(friend_username, loggedInUser);
+				}	
+				friend.setStatus(status);
+				friendDAO.updateFriendship(friend);
+				
+				friend.setErrorCode("200");
+				friend.setErrorMessage("Friend request updated successfully");
 			}
 		}
 	
@@ -260,7 +267,7 @@ public class FriendController {
 		if(onlinefriends.isEmpty())
 		{
 			friend.setErrorCode("404");
-			friend.setErrorMessage("You have no new friend requests");
+			friend.setErrorMessage("You do not have any friends online");
 			onlinefriends.add(friend);
 		}
 		
