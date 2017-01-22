@@ -15,17 +15,17 @@ import com.niit.hive.model.OutputMessage;
 @Controller
 public class ChatController {
 
-	@Autowired
+	/*@Autowired
 	private SimpMessagingTemplate template;
 
     public ChatController(SimpMessagingTemplate template) {
         this.template = template;
-    }
+    }*/
 	
 	@MessageMapping("/chat") //to send message
-	@SendToUser("/user/queue/message") //to receive message
-	public void sendReceiveMessage(Message message)
+	@SendTo("/user/queue/chatmessage")//to receive message
+	public OutputMessage sendReceiveMessage(Message message)
 	{
-		this.template.convertAndSendToUser(message.getFriend_id(), "/queue/message", new OutputMessage(message, new Date()));
+		return new OutputMessage(message, new Date());
 	}
 }
