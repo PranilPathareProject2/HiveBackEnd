@@ -19,6 +19,7 @@ import com.niit.hive.dao.UserCredentialDAO;
 import com.niit.hive.dao.UserDAO;
 import com.niit.hive.model.User;
 import com.niit.hive.model.UserCredential;
+import com.niit.hive.util.FileUpload;
 
 @RestController
 public class UserController {

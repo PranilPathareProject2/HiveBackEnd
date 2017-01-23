@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 @Entity
 @Table(name="HV_USER_DETAIL")
@@ -42,6 +43,9 @@ public class User extends BaseDomain{
 	
 	@Transient
 	private String role;
+	
+	@Transient
+	private MultipartFile multipartfile;
 	
 	public User() {
 		//super();
@@ -182,4 +186,13 @@ public class User extends BaseDomain{
 	public void setRole(String role) {
 		this.role = role;
 	}
+
+	public MultipartFile getMultipartfile() {
+		return multipartfile;
+	}
+
+	public void setMultipartfile(MultipartFile multipartfile) {
+		this.multipartfile = multipartfile;
+	}
+	
 }
