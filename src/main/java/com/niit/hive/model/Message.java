@@ -12,10 +12,10 @@ public class Message {
 		
 	}
 	
-	public Message(String message, int message_id) {
+	public Message(String message, int message_id, String friend_id) {
 		this.message = message;
 		this.message_id = message_id;
-		//this.friend_id = friend_id;
+		this.friend_id = friend_id;
 	}
 
 	public String getMessage() {
@@ -34,11 +34,11 @@ public class Message {
 		this.message_id = message_id;
 	}
 
-	/*public String getFriend_id() {
+	public String getFriend_id() {
 		return friend_id;
 	}
 
 	public void setFriend_id(String friend_id) {
 		this.friend_id = friend_id;
-	}*/
+	}
 }

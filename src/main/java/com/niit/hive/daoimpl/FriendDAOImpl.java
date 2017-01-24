@@ -1,5 +1,6 @@
 package com.niit.hive.daoimpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -161,6 +162,7 @@ public class FriendDAOImpl implements FriendDAO {
 		return lisfr;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	@Transactional
 	public List getOnlineFriends(String user_username) {
@@ -171,11 +173,24 @@ public class FriendDAOImpl implements FriendDAO {
 		Query q1 = sessionFactory.getCurrentSession().createQuery(hql1);
 		Query q2 = sessionFactory.getCurrentSession().createQuery(hql2);
 		
-		List lifo1 = q1.list();
-		List lifo2 = q2.list();
+		List liof1 = q1.list();
+		List liof2 = q2.list();
+		List liof3 = new ArrayList();
 		
-		lifo1.addAll(lifo2);
+		liof1.addAll(liof2);
 		
-		return lifo1;
+		for(int i = 0; i < liof1.size();i++)
+		{
+			String hql3 = "select username from User where username='"+liof1.get(i)+"' and status='online'";
+			Query q3 = sessionFactory.getCurrentSession().createQuery(hql3);
+			
+			if(!q3.list().isEmpty())
+			{	
+				liof3.add(q3.list().get(0));
+			}
+			System.out.println("List Size = "+liof3.size());
+		}
+		
+		return liof3;
 	}
 }

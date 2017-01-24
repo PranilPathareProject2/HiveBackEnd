@@ -8,7 +8,7 @@ public class OutputMessage extends Message{
 	
 	//Change the parameter to Message message, and set the this.message_date as message.getMessage() if Not working properly
 	public OutputMessage(Message message, Date message_date) {
-		super(message.getMessage(), message.getMessage_id());
+		super(message.getMessage(), message.getMessage_id(), message.getFriend_id());
 		this.message_date = message_date;
 		
 		//Switch to this if not working properly

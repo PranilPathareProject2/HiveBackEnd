@@ -197,7 +197,7 @@ public class UserController {
 			httpSession.setAttribute("loggedInUser", usercredobj.getUsername());
 			httpSession.setAttribute("loggedInUserRole", usercredobj.getRole());
 			userDAO.setOnline(usercredobj.getUsername());
-			friendDAO.setOnline(usercredobj.getUsername());
+			//friendDAO.setOnline(usercredobj.getUsername());
 		}
 		
 		return new ResponseEntity<UserCredential>(usercredobj, HttpStatus.OK);
@@ -208,7 +208,7 @@ public class UserController {
 	{
 		String username = (String) httpSession.getAttribute("loggedInUser");
 		userDAO.setOffline(username);
-		friendDAO.setOffline(username);
+		//friendDAO.setOffline(username);
 		
 		httpSession.invalidate();
 		

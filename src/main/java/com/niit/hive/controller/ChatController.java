@@ -23,7 +23,7 @@ public class ChatController {
     }*/
 	
 	@MessageMapping("/chat") //to send message
-	@SendTo("/user/queue/chatmessage")//to receive message
+	@SendTo("/queue/chatmessage")//to receive message
 	public OutputMessage sendReceiveMessage(Message message)
 	{
 		return new OutputMessage(message, new Date());
