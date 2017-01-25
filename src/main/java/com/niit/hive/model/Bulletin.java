@@ -2,6 +2,7 @@ package com.niit.hive.model;
 
 import java.sql.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Entity
 @Table(name="HV_BULLETIN")
 @Component
-public class Bulletin {
+public class Bulletin extends BaseDomain {
 
 	@Id
 	private String bulletin_id;
@@ -19,6 +20,9 @@ public class Bulletin {
 	private String bulletin_title;
 	
 	private String bulletin_description;
+	
+	@Column(columnDefinition = "String default 'Activated'", insertable = false)
+	private String status;
 
 	public String getBulletin_id() {
 		return bulletin_id;
@@ -42,5 +46,13 @@ public class Bulletin {
 
 	public void setBulletin_description(String bulletin_description) {
 		this.bulletin_description = bulletin_description;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }
