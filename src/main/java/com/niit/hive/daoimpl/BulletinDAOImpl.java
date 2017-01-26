@@ -38,10 +38,6 @@ public class BulletinDAOImpl implements BulletinDAO {
 	@Transactional
 	public boolean updateBulletin(Bulletin bulletin) {
 		try {
-			if(bulletin.getStatus() == null)
-			{
-				bulletin.setStatus("Activated");
-			}
 			sessionFactory.getCurrentSession().update(bulletin);
 		} catch (Exception e) {
 			return false;

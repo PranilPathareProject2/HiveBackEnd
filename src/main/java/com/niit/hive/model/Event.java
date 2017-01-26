@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Entity
 @Table(name="HV_EVENT")
 @Component
-public class Event {
+public class Event extends BaseDomain {
 
 	@Id
 	private String event_id;
@@ -25,6 +25,8 @@ public class Event {
 	private String event_time;
 	
 	private String event_venue;
+	
+	private String status;
 
 	public String getEvent_id() {
 		return event_id;
@@ -74,4 +76,11 @@ public class Event {
 		this.event_venue = event_venue;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 }
