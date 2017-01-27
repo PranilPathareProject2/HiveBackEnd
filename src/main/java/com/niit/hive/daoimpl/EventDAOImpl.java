@@ -26,6 +26,7 @@ public class EventDAOImpl implements EventDAO {
 	@Transactional
 	public boolean addEvent(Event event) {
 		try {
+			event.setEvent_id(this.nextEventID());
 			sessionFactory.getCurrentSession().save(event);
 			return true;
 		} catch (Exception e) {

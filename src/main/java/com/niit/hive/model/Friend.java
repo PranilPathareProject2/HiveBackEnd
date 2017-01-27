@@ -24,9 +24,6 @@ public class Friend extends BaseDomain{
 	@Column(insertable=false)
 	private String status;
 	
-	@Column(insertable=false)
-	private String is_online;
-
 	public String getFriend_id() {
 		return friend_id;
 	}
@@ -57,13 +54,5 @@ public class Friend extends BaseDomain{
 
 	public void setStatus(String status) {
 		this.status = status;
-	}
-
-	public String getIs_online() {
-		return is_online;
-	}
-
-	public void setIs_online(String is_online) {
-		this.is_online = is_online;
 	}
 }

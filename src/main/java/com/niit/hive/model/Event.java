@@ -2,6 +2,7 @@ package com.niit.hive.model;
 
 import java.sql.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -26,6 +27,7 @@ public class Event extends BaseDomain {
 	
 	private String event_venue;
 	
+	@Column(columnDefinition = "String default 'Activated'", insertable = false)
 	private String status;
 
 	public String getEvent_id() {
