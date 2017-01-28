@@ -23,7 +23,8 @@ public class Blog extends BaseDomain {
 	
 	private String created_by;
 	
-	private String published_on;
+	@Column(insertable = false, updatable = false)
+	private Date published_on;
 	
 	@Column(insertable = false)
 	private String status;
@@ -62,11 +63,11 @@ public class Blog extends BaseDomain {
 		this.created_by = created_by;
 	}
 
-	public String getPublished_on() {
+	public Date getPublished_on() {
 		return published_on;
 	}
 
-	public void setPublished_on(String published_on) {
+	public void setPublished_on(Date published_on) {
 		this.published_on = published_on;
 	}
 

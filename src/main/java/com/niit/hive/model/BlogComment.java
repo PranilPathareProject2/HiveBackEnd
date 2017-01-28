@@ -2,6 +2,7 @@ package com.niit.hive.model;
 
 import java.sql.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -22,6 +23,7 @@ public class BlogComment extends BaseDomain {
 	
 	private String blog_comment;
 	
+	@Column(insertable = false, updatable = false)
 	private Date blog_comment_date;
 
 	public String getBlog_comment_id() {

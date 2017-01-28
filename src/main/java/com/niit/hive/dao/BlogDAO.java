@@ -18,4 +18,5 @@ public interface BlogDAO {
 		public boolean updateBlogStatus(String blog_id, String status, String reason);
 		public String nextBlogID();
 		public String nextBlogCommentID();
+		public Blog isBlogByIDAndUsernameExists(String blog_id, String username);
 }

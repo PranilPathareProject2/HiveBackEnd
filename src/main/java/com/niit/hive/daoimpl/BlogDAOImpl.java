@@ -171,4 +171,15 @@ public class BlogDAOImpl implements BlogDAO {
 		
 		return libcbb;
 	}
+
+	@Override
+	@Transactional
+	public Blog isBlogByIDAndUsernameExists(String blog_id, String username) {
+		
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Blog.class);
+		criteria.add(Restrictions.eq("blog_id", blog_id));
+		criteria.add(Restrictions.eq("created_by", username));
+		
+		return (Blog) criteria.uniqueResult();
+	}
 }

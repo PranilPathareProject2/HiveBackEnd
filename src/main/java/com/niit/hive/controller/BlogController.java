@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.niit.hive.dao.BlogDAO;
 import com.niit.hive.model.Blog;
+import com.niit.hive.model.BlogComment;
 
 @RestController
 public class BlogController {
@@ -25,6 +26,9 @@ public class BlogController {
 	
 	@Autowired
 	Blog blog;
+	
+	@Autowired
+	BlogComment blogComment;
 	
 	@Autowired
 	HttpSession httpSession;
@@ -146,27 +150,20 @@ public class BlogController {
 		return new ResponseEntity<List<Blog>>(blogs, HttpStatus.OK);
 	}
 	
-	/********/
-	
 	@RequestMapping(value="/addblog", method=RequestMethod.POST)
 	public ResponseEntity<Blog> addBlog(@RequestBody Blog blog)
 	{
-		String loggedInUserRole = (String) httpSession.getAttribute("loggedInUserRole");
+		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
 
-		if(loggedInUserRole == null)
+		if(loggedInUser == null)
 		{
 			blog.setErrorCode("404");
 			blog.setErrorMessage("You have to login to add a blog");
 			return new ResponseEntity<Blog>(blog, HttpStatus.OK);
 		}
-		
-		if(!loggedInUserRole.equals("ROLE_ADMIN"))
-		{
-			blog.setErrorCode("404");
-			blog.setErrorMessage("You are not authorized to add a blog");			
-		}
 		else
 		{
+			blog.setCreated_by(loggedInUser);
 			if(blogDAO.addBlog(blog))
 			{
 				blog.setErrorCode("200");
@@ -184,31 +181,27 @@ public class BlogController {
 	@RequestMapping(value="/updateblog", method=RequestMethod.PUT)
 	public ResponseEntity<Blog> updateBlog(@RequestBody Blog blog)
 	{
-		String loggedInUserRole = (String) httpSession.getAttribute("loggedInUserRole");
+		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
 
-		if(loggedInUserRole == null)
+		if(loggedInUser == null)
 		{
 			blog.setErrorCode("404");
 			blog.setErrorMessage("You have to login to update a blog");
 			return new ResponseEntity<Blog>(blog, HttpStatus.OK);
 		}
-		
-		if(!loggedInUserRole.equals("ROLE_ADMIN"))
-		{
-			blog.setErrorCode("404");
-			blog.setErrorMessage("You are not authorized to update a blog");			
-		}
 		else
 		{
-			if(blogDAO.updateBlog(blog))
+			if(this.isBlogByIDAndUsernameExists(blog.getBlog_id(), loggedInUser))
 			{
+				//blog.setCreated_by(loggedInUser);
+				blogDAO.updateBlog(blog);
 				blog.setErrorCode("200");
 				blog.setErrorMessage("Blog updated successfully");
 			}
 			else
 			{
 				blog.setErrorCode("404");
-				blog.setErrorMessage("Blog not updated");
+				blog.setErrorMessage("Blog not updated, as it is not created by you");
 			}
 		}
 		return new ResponseEntity<Blog>(blog, HttpStatus.OK);
@@ -217,14 +210,70 @@ public class BlogController {
 	@RequestMapping(value="/getblog/{blog_id}", method=RequestMethod.GET)
 	public ResponseEntity<Blog> getBlogToUpdate(@PathVariable("blog_id") String blog_id)
 	{
-		blog = blogDAO.getBlog(blog_id);
-		if(blog == null)
+		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
+		
+		if(loggedInUser == null)
 		{
-			blog = new Blog();
 			blog.setErrorCode("404");
-			blog.setErrorMessage("The requested blog is not available");			
+			blog.setErrorMessage("You have to login to fetch a blog");
+			//return new ResponseEntity<Blog>(blog, HttpStatus.OK);
+		}
+		else if(this.isBlogByIDAndUsernameExists(blog_id, loggedInUser))
+		{
+			blog = blogDAO.getBlog(blog_id);
+			blog.setErrorCode("200");
+			blog.setErrorMessage("The requested blog is fetched successfully");			
+		}	
+		else
+		{
+			blog.setErrorCode("404");
+			blog.setErrorMessage("The requested blog is not created by you, so you cannot fetch it to update");
 		}
 		
 		return new ResponseEntity<Blog>(blog, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/listblogcommentsbyblog/{blog_id}", method=RequestMethod.GET)
+	public ResponseEntity<List<BlogComment>> listBlogCommentsByBlog(@PathVariable("blog_id") String blog_id)
+	{
+		List<BlogComment> blogcomments = blogDAO.listBlogCommentsByBlog(blog_id);
+		return new ResponseEntity<List<BlogComment>>(blogcomments, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/addblogcomment", method=RequestMethod.POST)
+	public ResponseEntity<BlogComment> addBlogComment(@RequestBody BlogComment blogcomment)
+	{
+		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
+
+		if(loggedInUser == null)
+		{
+			blogcomment.setErrorCode("404");
+			blogcomment.setErrorMessage("You have to login to add a blog comment");
+			return new ResponseEntity<BlogComment>(blogcomment, HttpStatus.OK);
+		}
+		else
+		{
+			blogcomment.setComment_by(loggedInUser);
+			if(blogDAO.addBlogComment(blogcomment))
+			{
+				blogcomment.setErrorCode("200");
+				blogcomment.setErrorMessage("Blog comment added successfully");
+			}
+			else
+			{
+				blogcomment.setErrorCode("404");
+				blogcomment.setErrorMessage("Blog comment not added");
+			}
+		}
+
+		return new ResponseEntity<BlogComment>(blogcomment, HttpStatus.OK);
+	}
+	
+	private boolean isBlogByIDAndUsernameExists(String blog_id, String username)
+	{
+		if(blogDAO.isBlogByIDAndUsernameExists(blog_id, username) != null)
+			return true;
+		else
+			return false;
 	}
 }
