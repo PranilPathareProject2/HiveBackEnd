@@ -232,6 +232,13 @@ public class BlogController {
 		
 		return new ResponseEntity<Blog>(blog, HttpStatus.OK);
 	}
+
+	@RequestMapping(value="/getblogtodisplay/{blog_id}", method=RequestMethod.GET)
+	public ResponseEntity<Blog> getBlogToDisplay(@PathVariable("blog_id") String blog_id)
+	{
+		blog = blogDAO.getBlog(blog_id);
+		return new ResponseEntity<Blog>(blog, HttpStatus.OK);
+	}
 	
 	@RequestMapping(value="/listblogcommentsbyblog/{blog_id}", method=RequestMethod.GET)
 	public ResponseEntity<List<BlogComment>> listBlogCommentsByBlog(@PathVariable("blog_id") String blog_id)
