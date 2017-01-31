@@ -247,8 +247,8 @@ public class BlogController {
 		return new ResponseEntity<List<BlogComment>>(blogcomments, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/addblogcomment", method=RequestMethod.POST)
-	public ResponseEntity<BlogComment> addBlogComment(@RequestBody BlogComment blogcomment)
+	@RequestMapping(value="/addblogcomment/{blog_id}", method=RequestMethod.POST)
+	public ResponseEntity<BlogComment> addBlogComment(@RequestBody BlogComment blogcomment, @PathVariable("blog_id") String blog_id)
 	{
 		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
 
@@ -260,6 +260,7 @@ public class BlogController {
 		}
 		else
 		{
+			blogcomment.setBlog_id(blog_id);
 			blogcomment.setComment_by(loggedInUser);
 			if(blogDAO.addBlogComment(blogcomment))
 			{
