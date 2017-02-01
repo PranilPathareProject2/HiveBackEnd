@@ -129,23 +129,23 @@ public class BlogController {
 		String loggedInUser = (String) httpSession.getAttribute("loggedInUser");
 
 		List<Blog> blogs = new ArrayList<Blog>();
-		/*if(loggedInUser == null)
+		if(loggedInUser == null)
 		{
 			blog.setErrorCode("404");
 			blog.setErrorMessage("You have to login to see your blogs");
 			blogs.add(blog);
 		}
 		else
-		{*/	
+		{	
 			blogs = blogDAO.listBlogsByUser(loggedInUser);
 			
 			if(blogs.isEmpty())
 			{
 				blog.setErrorCode("404");
-				blog.setErrorMessage("You have no blogs to manage");
+				blog.setErrorMessage("You have not created any blog yet");
 				blogs.add(blog);
 			}
-		//}
+		}
 		
 		return new ResponseEntity<List<Blog>>(blogs, HttpStatus.OK);
 	}
