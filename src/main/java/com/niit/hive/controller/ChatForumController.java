@@ -16,6 +16,7 @@ public class ChatForumController {
 	@SendTo("/topic/message") //to receive message
 	public OutputMessage sendReceiveMessage(Message message)
 	{
+		//System.out.println("Message:"+message.getMessage());
 		return new OutputMessage(message, new Date());
 	}
 }
