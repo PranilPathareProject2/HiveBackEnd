@@ -25,6 +25,18 @@ public class ChatForumDAOImpl implements ChatForumDAO {
 
 	@Override
 	@Transactional
+	public boolean addForum(ChatForum chatforum) {
+		try {
+			chatforum.setChat_forum_id(nextChatForumID());
+			sessionFactory.getCurrentSession().save(chatforum);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	@Override
+	@Transactional
 	public boolean addChatForumComment(ChatForumComment chatforumcomment) {
 		try {
 			chatforumcomment.setChat_forum_comment_id(nextChatForumCommentID());

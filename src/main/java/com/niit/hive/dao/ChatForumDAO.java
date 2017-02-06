@@ -2,6 +2,7 @@ package com.niit.hive.dao;
 
 import java.util.List;
 
+import com.niit.hive.model.ChatForum;
 import com.niit.hive.model.ChatForumComment;
 
 public interface ChatForumDAO {
@@ -17,5 +18,7 @@ public interface ChatForumDAO {
 	public String nextChatForumID();
 
 	public List listChatForumCommentsByChatForum(String chatforum_id);
+
+	public boolean addForum(ChatForum chatforum);
 
 }
