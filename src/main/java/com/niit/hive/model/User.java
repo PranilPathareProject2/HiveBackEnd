@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Table(name="HV_USER_DETAIL")
 @Component
 //@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
-//@JsonAutoDetect
+//@JsonAutoDe[tect
 public class User extends BaseDomain{
 
 	@Id
